@@ -5,11 +5,11 @@ clean_amenities <- function(listings_df) {
     mutate(amenities = gsub(" |/", "_", amenities)) %>%
     mutate(amenities = gsub("24", "x24", amenities))
   
-  # Then, split the strings by amenity and create new column
+  # Then, split the strings by amenity and create new columns
   splitting <- strsplit(listings_df$amenities, ",")
   all_amenities <- Reduce(union, splitting)
   for (i in all_amenities) {
-    listings_df[paste("amenity_", i, sep = "")] <- 
+    listings_df[paste0("amenity_", i)] <- 
       grepl(i, listings_df$amenities)
   }
   return(listings_df)

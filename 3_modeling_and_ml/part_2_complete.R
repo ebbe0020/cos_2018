@@ -5,7 +5,7 @@ library(tidyverse)
 
 # Read in listings data set, and convert price column to numeric
 listings <- read.csv("../data/listings.csv")
-listings$price <- as.numeric(gsub('\\$|,','',as.character(listings$price)))
+listings$price <- as.numeric(gsub('\\$|,', '', as.character(listings$price)))
 
 # Read in the reviews data set, making sure to set stringsAsFactors=FALSE
 reviews <- read.csv("../data/reviews.csv", stringsAsFactors = FALSE)
@@ -14,7 +14,8 @@ reviews <- read.csv("../data/reviews.csv", stringsAsFactors = FALSE)
 # View the data from `reviews.csv`. What does each row represent?
 head(reviews, 3)
 
-# Display the top 10 most reviewed Airbnb listings using the `reviews` data frame.
+# Display the top 10 most reviewed Airbnb listings using
+# the `reviews` data frame.
 # Are the counts consistent with the data in the `listings` data frame?
 sort(listings$number_of_reviews, decreasing = TRUE)[1:10]
 sort(table(reviews$listing_id), decreasing = TRUE)[1:10]
@@ -25,14 +26,15 @@ sort(table(reviews$listing_id), decreasing = TRUE)[1:10]
 # data structure before performing the analysis. Both data frames have
 # 2829 unique listings with >= 1 review - let's confirm this fact.
 length(unique(listings$id))
-nrow(filter(listings, number_of_reviews>0))
+nrow(filter(listings, number_of_reviews > 0))
 length(unique(reviews$listing_id))
 
 # We will take `review_scores_rating` as the dependent variable that we
 # are trying to predict.  This is the average customer rating of the Airbnb listing,
 # on a scale of 0-100. Plot a simple histogram of `review_scores_rating`,
 # and count the number of values != NA.
-hist(listings$review_scores_rating)
+ggplot(data = listings) +
+  geom_bar(aes(x = review_scores_rating))
 sum(!is.na(listings$review_scores_rating))
 
 # Next, create a new data frame with just the review scores data from `listings.csv`.
@@ -58,16 +60,16 @@ f <- function(x){
 # "Terrible"  if rating <= 79
 # For example: convert_rating(64) should output "Terrible"
 # **Solution:**
-convert_rating <- function(rating){
-  if(rating == 100){
+convert_rating <- function(rating) {
+  if (rating == 100) {
     return("Perfect")
-  }else if(rating >= 95){
+  } else if (rating >= 95) {
     return("High")
-  }else if(rating >= 90){
+  } else if (rating >= 90) {
     return("Mid")
-  }else if(rating >= 80){
+  } else if (rating >= 80) {
     return("Low")
-  }else{
+  } else {
     return("Terrible")
   }
 }
@@ -106,7 +108,7 @@ str(reviews)
 reviews_by_listing <- reviews %>%
   select(listing_id, comments) %>%
   group_by(listing_id) %>%
-  summarize(all_comments = paste(comments,collapse=" "))
+  summarize(all_comments = paste(comments, collapse = " "))
 
 # Check out the updated data frame - 2829 rows.
 str(reviews_by_listing)
@@ -176,7 +178,7 @@ commentsTM <- as.data.frame(as.matrix(sparse))
 str(commentsTM, list.len = 10)
 
 # Drop columns that include numbers
-commentsTM <- commentsTM[,!grepl("[0-9]",names(commentsTM))]
+commentsTM <- commentsTM[, !grepl("[0-9]", names(commentsTM))]
 
 # We have finished building the term frequency data frame `commentsTM`.
 # Next, we need to merge the two data frames `commentsTM` (features) and
@@ -257,9 +259,9 @@ str(commentsTM$RATING_TEXT)
 # install.packages("caTools")
 library(caTools)
 set.seed(123)
-spl = sample.split(commentsTM$RATING_TEXT, SplitRatio = 0.7)
-commentsTrain = subset(commentsTM, spl == TRUE)
-commentsTest = subset(commentsTM, spl == FALSE)
+spl <- sample.split(commentsTM$RATING_TEXT, SplitRatio = 0.7)
+commentsTrain <- subset(commentsTM, spl == TRUE)
+commentsTest <- subset(commentsTM, spl == FALSE)
 
 # Let's use CART! Why CART?
 # install.packages("rpart")
