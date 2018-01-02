@@ -202,59 +202,6 @@ OSR2
 #' For more detailed info, see
 #' <https://stat.ethz.ch/R-manual/R-devel/library/stats/html/formula.html>.	
 
-#' ### Other Models - Splines	
-#' Now that we've identified the pattern, let's look at another type
-#' of model: splines. Without going into all the mathematical details,
-#' splines are (roughly) one way of fitting a higher-degree polynomial
-#' to the data. Let's look at what happens when we allow a quadratic
-#' and cubic fit in the price by accomodation size setting.	
-library(splines)
-lm2 <- lm(price ~ ns(accommodates, 2), data = listingsTrain)	
-lm3 <- lm(price ~ ns(accommodates, 3), data = listingsTrain)	
-
-#' We can again look inside these model objects using `summary()`:
-summary(lm2)	
-
-#' We can also plot the out-of-sample performance of each separately:
-listingsTest %>%	
-  add_predictions(lm2) %>%	
-  ggplot(aes(x = accommodates)) +	
-  geom_point(aes(y = price)) +	
-  geom_line(aes(y = pred), color = 'red')
-
-#' To plot the linear, quadratic, and cubic models all at once, we'll
-#' use `gather_predictions()`. This function makes a big long column
-#' of predictions, with another column to tell which model generated
-#' which prediction (so that the data is in *long* or *tidy* format):
-listingsTest %>%	
-  gather_predictions(lm1, lm2, lm3) %>%	
-  ggplot(aes(x = accommodates)) +	
-  geom_point(aes(y = price)) +	
-  geom_line(aes(y = pred, group = model, color = model))	
-
-#' In this case, all the models look reasonable. Let's compare the
-#' in-sample and out-of-sample R^2 values:
-summary(lm1)
-summary(lm2)
-summary(lm3)
-OSR2
-pred_test_2 <- predict(lm2, newdata = listingsTest)
-OSR2_2 <- 1 - sum((pred_test_2 - listingsTest$price) ^ 2) /
-  sum((mean(listingsTrain$price) - listingsTest$price) ^ 2)
-pred_test_3 <- predict(lm3, newdata = listingsTest)
-OSR2_3 <- 1 - sum((pred_test_3 - listingsTest$price) ^ 2) /
-  sum((mean(listingsTrain$price) - listingsTest$price) ^ 2)
-OSR2
-OSR2_2
-OSR2_3
-
-#' All values are roughly the same. The higher-order models give a bit
-#' of advantage, but not much. The fact that we only gain slightly
-#' from a more complex model isn't surprising, given that we only
-#' have data for 10 distinct values of the `accommodates` variable.
-#' In fact, in some cases more complex models perform *worse* since
-#' they overfit to the data in the training set.	
-
 #' ## Model Selection and Tuning: Penalized Regression	
 #' Let's work a bit harder on predicting price, this time using more
 #' than one predictor. In fact, we'll add a bunch of predictors to
@@ -353,11 +300,11 @@ OSR2_big # Out-of-sample
 #' regression, then the regular regression we've worked with
 #' looks like	
 #' $$	
-#' \min_\beta \sum_{t=1}^n (y_t-x_t^T\beta)^2,	
+#' \min_\beta \sum_{i=1}^n (y_i-x_i^T\beta)^2,	
 #' $$	
 #' but penalized regression looks like	
 #' $$	
-#' \min_\beta \sum_{t=1}^n (y_t-x_t^T\beta)^2 + \lambda ||\beta||.	
+#' \min_\beta \sum_{i=1}^n (y_i-x_i^T\beta)^2 + \lambda ||\beta||.	
 #' $$	
 
 #' There are two types of flexibility within this framework:
