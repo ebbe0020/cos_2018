@@ -72,7 +72,7 @@ lm1$call
 
 #' The function `summary()` is overloaded for many different objects
 #' and often gives a useful snapshot of the model as well.
-summary(lm1)	
+summary(lm1)
 
 #' There we go, this is more useful! First, let's look at the section
 #' under "Coefficients". Notice that R automatically adds an intercept
@@ -233,7 +233,7 @@ listingsTest %>%
   geom_line(aes(y = pred, group = model, color = model))	
 
 #' In this case, all the models look reasonable. Let's compare the
-#' RMSE and MAE:
+#' in-sample and out-of-sample R^2 values:
 summary(lm1)
 summary(lm2)
 summary(lm3)
@@ -475,7 +475,6 @@ summary(lasso_price_cv) # What does the model object look like?
 #' There's another automatic plotting function for `cv.glmnet()`
 #' which shows the error for each model:	
 plot.cv.glmnet(lasso_price_cv)
-
 
 #' The first vertical dotted line shows `lambda.min`, and the
 #' second is `lambda.1se`. The figure illustrates that we cross-validate
